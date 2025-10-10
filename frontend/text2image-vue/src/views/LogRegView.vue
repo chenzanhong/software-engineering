@@ -235,7 +235,7 @@ export default {
 
 .left-side-container {
   flex: 1;
-  background-image: url(https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202412091935661.jpg);
+  background-image: url(https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202412091935661.jpg);
   background-size: cover;
   display: flex;
   flex-direction: column;

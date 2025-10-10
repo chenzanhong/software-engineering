@@ -87,7 +87,7 @@ export default {
       return this.$store.state.appName;
     },
     avatarUrl() {
-      return localStorage.getItem('avatarUrl') || 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202412101217874.png';
+      return localStorage.getItem('avatarUrl') || 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202412101217874.png';
     },
     username() {
       return localStorage.getItem('username') || '未知用户';
@@ -117,7 +117,7 @@ export default {
 //         "email": "root@example.com",
 //         "username": "root",
 //         "password": "bcb15f821479b4d5772bd0ca866c00ad5f926e3580720659cc80d39c9d09802a",
-//         "avatar_url": "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202407272335307.png",
+//         "avatar_url": "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202407272335307.png",
 //         "score": 10000,
 //         "token": "",
 //         "create_time": "0001-01-01T00:00:00Z"

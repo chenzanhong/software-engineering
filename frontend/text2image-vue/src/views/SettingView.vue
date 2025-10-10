@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       user: {
-        avatar: localStorage.getItem('avatarUrl') || 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202412092143859.png',
+        avatar: localStorage.getItem('avatarUrl') || 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202412092143859.png',
         username: localStorage.getItem('username') || '未知用户',
         email: localStorage.getItem('email') || '未知邮箱',
         collectedPictures: localStorage.getItem('score') || 0,

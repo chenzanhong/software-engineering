@@ -139,7 +139,7 @@ export default {
             "height": 1024,
             "seed": 1024,
             "steps": 10,
-            "img_url": `https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202408311347062.jpg`,
+            "img_url": `https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202408311347062.jpg`,
           }],
       loading: false,
       apiMode: 'remote',

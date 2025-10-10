@@ -2,7 +2,7 @@
 
 文绘星河 是一个文本到图片的 Web 应用，实现了账号的注册与管理、文生图的前端抽象集成、个人信息管理以及文生图历史查看等功能。
 
-![文绘星河](https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202412251121811.png)
+![文绘星河](https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202412251121811.png)
 
 ## 项目结构
 
@@ -65,7 +65,7 @@
 3. **编辑 `.env` 文件**：
    在 `.env` 文件中，填入阿里云OSS的密钥。以下是一个示例配置：
    ```plaintext
-   VUE_APP_OSS_REGION=oss-cn-shenzhen
+   VUE_APP_OSS_REGION=oss-cn-shenzhen.aliyuncs.com
    VUE_APP_OSS_ACCESS_KEY_ID=your_access_key_id
    VUE_APP_OSS_ACCESS_KEY_SECRET=your_access_key_secret
    VUE_APP_OSS_BUCKET=your_bucket_name

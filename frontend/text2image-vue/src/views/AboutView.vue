@@ -104,7 +104,7 @@ export default {
       "实时预览",
       "云存储集成"
     ],
-    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202411282246111.png', // 您可以根据实际情况替换这里的值
+    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202411282246111.png', // 您可以根据实际情况替换这里的值
     'desc-text': '优势'  // 同上
   },
   {
@@ -120,7 +120,7 @@ export default {
       "数据安全",
       "持续更新"
     ],
-    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202411282346198.png',
+    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202411282346198.png',
     'desc-text': '特点'
   },
   {
@@ -136,7 +136,7 @@ export default {
       "智能推荐",
       "社交分享"
     ],
-    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202411282351707.png',
+    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202411282351707.png',
     'desc-text': '功能'
   },
   {
@@ -153,7 +153,7 @@ export default {
       "同步功能",
       "安全加密"
     ],
-    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202411282345690.png',
+    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202411282345690.png',
     'desc-text': '特性'
   },
   {
@@ -170,7 +170,7 @@ export default {
       "交互式元素",
       "分享选项"
     ],
-    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202411282349099.png',
+    'bg-img': 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202411282349099.png',
     'desc-text': '功能'
   }
       ],
@@ -279,7 +279,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
-  background-image: url(https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202408311347062.jpg);
+  background-image: url(https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202408311347062.jpg);
 }
 
 .project-description h1 {
