@@ -272,6 +272,14 @@ func SavetoOss(imageParaments ImageParaments) (string, error) {
 	}
 	log.Printf("文件 %s 已成功上传到 OSS, object name: %s", localFilePath, objectName)
 
+	// 🔥 上传成功后，删除本地文件
+	if err := os.Remove(localFilePath); err != nil {
+		log.Printf("警告：无法删除本地文件 %s: %v", localFilePath, err)
+		// 不 return 错误，因为上传已成功，删除失败只是警告
+	} else {
+		log.Printf("本地文件 %s 已删除", localFilePath)
+	}
+
 	url, err := bucket.SignURL(objectName, oss.HTTPGet, 3600)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate URL: %v", err)
