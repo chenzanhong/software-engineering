@@ -105,7 +105,7 @@ config.json
 coverage/
 *.coverage
 *.cover
-*.pyc
+*.pyc1
 *.pyo
 *.egg-info/
 *.egg

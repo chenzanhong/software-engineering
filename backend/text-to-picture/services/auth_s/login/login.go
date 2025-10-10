@@ -2,18 +2,18 @@ package auth_s
 
 import (
 	"errors"
-	"log"
 	"fmt"
+	"log"
 	"net/http"
 	middlewire "text-to-picture/middlewire/jwt" // JWT 认证中间件
-	models "text-to-picture/models/init"         // 数据库模型初始化
-	"text-to-picture/models/repository/user_r"    // 用户数据访问层
-	userLogin "text-to-picture/models/user"      // 用户模型
+	models "text-to-picture/models/init"        // 数据库模型初始化
+	"text-to-picture/models/repository/user_r"  // 用户数据访问层
+	userLogin "text-to-picture/models/user"     // 用户模型
 	"time"
 
 	"github.com/dgrijalva/jwt-go" // JWT 库
 	"github.com/gin-gonic/gin"    // Gin 框架
-	_ "github.com/lib/pq"        // PostgreSQL 驱动
+	_ "github.com/lib/pq"         // PostgreSQL 驱动
 	"gorm.io/gorm"                // GORM ORM
 )
 
@@ -40,7 +40,7 @@ func Register(c *gin.Context) {
 			"message": "请求数据格式错误"})
 		return
 	}
-	input.Avatar_url = "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202412092143859.png"
+	input.Avatar_url = "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202412092143859.png"
 	//插入数据
 	if err := user_r.InsertUserInformation(models.DB, &input); err != nil {
 		// 如果插入失败，返回 500 错误
@@ -133,7 +133,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	 // 更新用户的 token
+	// 更新用户的 token
 	updates := map[string]interface{}{
 		"token": tokenString,
 	}
@@ -148,6 +148,6 @@ func Login(c *gin.Context) {
 		"code":    http.StatusOK,
 		"message": "登录成功",
 		"token":   tokenString,
-		"avatar": user.Avatar_url, // 前端登录后及时刷新头像需要用到
+		"avatar":  user.Avatar_url, // 前端登录后及时刷新头像需要用到
 	})
 }

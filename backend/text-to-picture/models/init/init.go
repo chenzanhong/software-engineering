@@ -100,7 +100,7 @@ func InitDB() error {
 
 	if err := tx.Exec(createTableSQL).Error; err != nil {
 		tx.Rollback() // 回滚事务
-		return err // 返回创建表时的错误
+		return err    // 返回创建表时的错误
 	}
 
 	if err := tx.Commit().Error; err != nil {
@@ -130,7 +130,7 @@ func InitTestUser() error {
 		user.Score = 10000
 		if result := tx.Save(&user); result.Error != nil {
 			log.Printf("Failed to update user score: %v", result.Error)
-			tx.Rollback() // 回滚事务
+			tx.Rollback()       // 回滚事务
 			return result.Error // 返回更新错误
 		}
 
@@ -138,34 +138,34 @@ func InitTestUser() error {
 		return nil
 	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		log.Printf("Failed to find user: %v", result.Error)
-		tx.Rollback() // 回滚事务
+		tx.Rollback()       // 回滚事务
 		return result.Error // 返回查找用户错误
 	}
 
 	// 创建用户信息
 	user = user2.UserInformation{
-		Email:       "root@example.com", // 用户邮箱
-		UserName:    "root",              // 用户名
-		Password:    "bcb15f821479b4d5772bd0ca866c00ad5f926e3580720659cc80d39c9d09802a", // 密码（加密后的）
-		Avatar_url:  "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com/chuhsing/202407272335307.png", // 头像URL
-		Score:       10000,              // 用户分数
-		Create_time: currentTime.AddDate(-1, 0, 0), // 创建时间为一年前
+		Email:       "root@example.com",                                                                                    // 用户邮箱
+		UserName:    "root",                                                                                                // 用户名
+		Password:    "bcb15f821479b4d5772bd0ca866c00ad5f926e3580720659cc80d39c9d09802a",                                    // 密码（加密后的）
+		Avatar_url:  "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202407272335307.png", // 头像URL
+		Score:       10000,                                                                                                 // 用户分数
+		Create_time: currentTime.AddDate(-1, 0, 0),                                                                         // 创建时间为一年前
 	}
 	if result := tx.Create(&user); result.Error != nil {
 		log.Printf("Failed to create user: %v", result.Error)
-		tx.Rollback() // 回滚事务
+		tx.Rollback()       // 回滚事务
 		return result.Error // 返回创建用户错误
 	}
 
 	// 创建用户积分记录
 	userscore := user2.UserScore{
-		Username:    "root",              // 用户名
-		Record:      "积分+100",          // 积分记录内容
+		Username:    "root",                        // 用户名
+		Record:      "积分+100",                      // 积分记录内容
 		Create_time: currentTime.AddDate(0, -1, 0), // 创建时间为一个月前
 	}
 	if result := tx.Create(&userscore); result.Error != nil {
 		log.Printf("Failed to create record: %v", result.Error)
-		tx.Rollback() // 回滚事务
+		tx.Rollback()       // 回滚事务
 		return result.Error // 返回创建记录错误
 	}
 
@@ -175,7 +175,7 @@ func InitTestUser() error {
 	if err != nil {
 		log.Printf("Failed to open file: %v", err)
 		tx.Rollback() // 回滚事务
-		return err // 返回打开文件错误
+		return err    // 返回打开文件错误
 	}
 	defer file.Close() // 确保文件在函数结束时关闭
 
@@ -187,7 +187,7 @@ func InitTestUser() error {
 
 	if err := scanner.Err(); err != nil {
 		log.Printf("Failed to read file : %v", err)
-		tx.Rollback() // 回滚事务
+		tx.Rollback()                // 回滚事务
 		return fmt.Errorf("&v", err) // 返回读取文件错误
 	}
 	i := 0
@@ -195,13 +195,13 @@ func InitTestUser() error {
 	// 创建图像记录
 	for _, url := range imageUrls {
 		i++
-		test := fmt.Sprintf("test%d", i) // 生成测试参数
+		test := fmt.Sprintf("test%d", i)                   // 生成测试参数
 		createTime := currentTime.AddDate(0, 0, -(11 + i)) // 创建时间递减
 		imageInfo := image2.ImageInformation{
-			UserName:    "root", // 假设用户名为root
+			UserName:    "root",                                                                                                                      // 假设用户名为root
 			Params:      "\"Prompt\": \"" + test + "\", \"Width\": \"512\", \"Height\": \"512\", \"Steps\": \"20\", \"SamplingMethod\": \"Euler a\"", // 图像生成参数
-			Picture:     url, // 图像URL
-			Create_time: createTime, // 创建时间
+			Picture:     url,                                                                                                                         // 图像URL
+			Create_time: createTime,                                                                                                                  // 创建时间
 		}
 
 		result := tx.Create(&imageInfo) // 创建图像信息记录
@@ -213,9 +213,9 @@ func InitTestUser() error {
 
 	// 如果超过10张图像，随机选取10个用于点赞和收藏
 	if len(imageUrls) > 10 {
-		rand.Seed(time.Now().UnixNano()) // 设置随机种子
+		rand.Seed(time.Now().UnixNano())                                                                         // 设置随机种子
 		rand.Shuffle(len(imageUrls), func(i, j int) { imageUrls[i], imageUrls[j] = imageUrls[j], imageUrls[i] }) // 随机打乱图像URL顺序
-		imageUrls = imageUrls[:10] // 只保留前10个图像URL
+		imageUrls = imageUrls[:10]                                                                               // 只保留前10个图像URL
 	}
 
 	currentTime = time.Now() // 更新当前时间
@@ -225,13 +225,13 @@ func InitTestUser() error {
 		createTime := currentTime.AddDate(0, 0, -(i + 1)) // 创建时间递减
 		// 创建图像收藏记录
 		imagefavor := image2.FavoritedImages{
-			UserName:    "root", // 假设用户名为root
-			Picture:     url, // 图像URL
+			UserName:    "root",     // 假设用户名为root
+			Picture:     url,        // 图像URL
 			Create_time: createTime, // 创建时间
 		}
 		if result := tx.Create(&imagefavor); result.Error != nil {
 			log.Printf("Failed to create image favor for URL %s: %v", url, result.Error)
-			tx.Rollback() // 回滚事务
+			tx.Rollback()       // 回滚事务
 			return result.Error // 返回创建图像收藏错误
 		}
 	}

@@ -34,7 +34,7 @@ func InsertUserInformation(db *gorm.DB, user *userLogin.UserInformation) error {
 	}
 	var existingUserLogin userLogin.UserInformation
 
-	// 检查邮箱是否已存在
+	// 检查用户名是否已存在
 	result := db.Where("UserName = ?", user.UserName).First(&existingUserLogin)
 	if result.Error == nil {
 		return fmt.Errorf("用户名已存在")

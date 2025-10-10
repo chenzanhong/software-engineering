@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"runtime"
 	"strconv"
 
 	"os"
@@ -208,15 +209,16 @@ func GenerateImage(username string, imageParaments ImageParaments) (string, erro
 		return urloss, err
 	}
 
-	return urloss, err
+	return urloss, nil
 }
 
 var client *oss.Client // 全局变量用来存储OSS客户端实例
 func SavetoOss(imageParaments ImageParaments) (string, error) {
 	// 构建跨平台的路径
-	//localFileName := "D:/goproject/src/gocode/backend/backend/text-to-picture/assets/examples/images/3.jpg" //测试就换成自己要上传的图片即可
-
-	localFileName, err := GenerateFromWebUI(imageParaments)
+	localFilePath, err := GenerateFromWebUI(imageParaments)
+	if err != nil {
+		return "", fmt.Errorf("图片生成或下载失败: %v", err)
+	}
 	// 从环境变量中获取访问凭证
 	region := os.Getenv("OSS_REGION")
 	bucketName := os.Getenv("OSS_BUCKET")
@@ -226,34 +228,50 @@ func SavetoOss(imageParaments ImageParaments) (string, error) {
 	// 检查bucket名称是否为空
 	if len(bucketName) == 0 {
 		flag.PrintDefaults()
-		log.Fatalf("invalid parameters, bucket name required")
+		return "", fmt.Errorf("invalid parameters, bucket name required")
 	}
 
 	// 检查region是否为空
 	if len(region) == 0 {
 		flag.PrintDefaults()
-		log.Fatalf("invalid parameters, region required")
+		return "", fmt.Errorf("invalid parameters, region required")
 	}
 
 	// 检查object名称是否为空
 	if len(object) == 0 {
 		flag.PrintDefaults()
-		log.Fatalf("invalid parameters, object name required")
+		return "", fmt.Errorf("invalid parameters, object name required")
 	}
 
 	// 创建OSS客户端
-	endPoint := region + ".aliyuncs.com"
-	client, err := oss.New(endPoint, accessKeyId, accessKeySecret)
+	if client == nil {
+		endPoint := region + ".aliyuncs.com"
+		client, err = oss.New(endPoint, accessKeyId, accessKeySecret)
+		if err != nil {
+			return "", fmt.Errorf("创建OSS客户端失败: %v", err)
+		}
+	}
+	// 获取Bucket
 	bucket, err := client.Bucket(bucketName)
-	file, err := os.Open(localFileName)
+	if err != nil {
+		return "", fmt.Errorf("获取OSS Bucket失败: %v", err)
+	}
+
+	file, err := os.Open(localFilePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to open file: %v", err)
 	}
 	defer file.Close()
 
-	objectName := "generate/" + localFileName // You can modify this path as needed
-	result := bucket.PutObject(objectName, file)
-	log.Printf("result: %v", result)
+	// 正确的做法：只取文件名，放在 generate/ 目录下
+	fileName := filepath.Base(localFilePath) // 只获取文件名，例如 image_2025-10-10_15-30-45.png
+	objectName := "generate/" + fileName       // OSS中的路径为 generate/image_2025-10-10_15-30-45.png
+	err = bucket.PutObject(objectName, file)
+	if err != nil {
+		return "", fmt.Errorf("上传文件到OSS失败: %v", err)
+	}
+	log.Printf("文件 %s 已成功上传到 OSS, object name: %s", localFilePath, objectName)
+
 	url, err := bucket.SignURL(objectName, oss.HTTPGet, 3600)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate URL: %v", err)
@@ -269,6 +287,9 @@ func handleError(err error) {
 func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 	var Url string
 	apiKey := os.Getenv("GEN_API_KEY")
+	if apiKey == "" {
+		return "", fmt.Errorf("GEN_API_KEY 环境变量未设置")
+	}
 	type Parameters struct {
 		Size string `json:"size"`
 		Seed int    `json:"seed"`
@@ -305,7 +326,7 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 	size := fmt.Sprintf("%d*%d", imageParaments.Width, imageParaments.Height)
 	// 构建请求体
 	requestBody := RequestBody{
-		Model: "flux-dev",
+		Model: "wan2.5-t2i-preview",
 		Input: Input{
 			Prompt: imageParaments.Prompt,
 		},
@@ -336,7 +357,7 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 	// 发送请求
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("发送请求失败: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -360,7 +381,13 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 	// 轮询任务状态
 	for {
 		t := os.Getenv("TIME")
+		if t == "" {
+			t = "5" // 默认5秒轮询一次
+		}
 		sleepSeconds, err := strconv.Atoi(t)
+		if err != nil {
+			sleepSeconds = 5
+		}
 		sleepDuration := time.Duration(sleepSeconds) * time.Second
 		// 使用 time.Sleep
 		time.Sleep(sleepDuration)
@@ -377,7 +404,7 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 		// 发送请求
 		statusResp, err := client.Do(statusReq)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("发送状态查询请求失败: %v", err)
 		}
 		defer statusResp.Body.Close()
 
@@ -391,7 +418,7 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 		var taskStatusResponse TaskStatusResponse
 		err = json.Unmarshal(statusBodyText, &taskStatusResponse)
 		if err != nil {
-			return "", fmt.Errorf("解析响应失败%v", err)
+			return "", fmt.Errorf("解析状态查询响应失败: %v, 响应内容: %s", err, string(statusBodyText))
 		}
 
 		if taskStatusResponse.Output.TaskStatus == "SUCCEEDED" {
@@ -399,11 +426,15 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 			url := taskStatusResponse.Output.Result[0].URL
 			// 使用 filepath.Join 构建跨平台路径
 			filetime := time.Now().Format("2006-01-02_15-04-05")
-			localFileName := filepath.Join("assets/examples/images/", fmt.Sprintf("image_%s.png", filetime))
-			if err := downloadImageFromWebUI(url, localFileName); err != nil {
+			_, currentFile, _, _ := runtime.Caller(0)
+			dir := filepath.Join(filepath.Dir(currentFile), "..", "..", "assets", "examples", "images")
+			localFilePath := filepath.Join(dir, fmt.Sprintf("image_%s.png", filetime))
+			log.Printf("准备下载图片到: %s", localFilePath)
+			if err := downloadImageFromWebUI(url, localFilePath); err != nil {
 				log.Printf("图片从模型保存到本地错误%v", err)
+				return "", err // ← 关键：必须返回错误，不能继续
 			}
-			Url = localFileName
+			Url = localFilePath
 			break
 		} else if taskStatusResponse.Output.TaskStatus == "FAILED" {
 			log.Printf("任务失败%v,message:%v", taskStatusResponse.Output.Code, taskStatusResponse.Output.Message)
@@ -414,26 +445,33 @@ func GenerateFromWebUI(imageParaments ImageParaments) (string, error) {
 }
 
 func downloadImageFromWebUI(url string, destinationPath string) error {
-	// 发送HTTP GET请求
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("下载图片失败: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// 创建本地文件
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("下载图片失败: HTTP %d", resp.StatusCode)
+	}
+
+	// 确保目录存在
+	dir := filepath.Dir(destinationPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("创建目录失败: %v", err)
+	}
+
 	out, err := os.Create(destinationPath)
 	if err != nil {
 		return fmt.Errorf("创建文件失败: %v", err)
 	}
 	defer out.Close()
 
-	// 复制数据
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return fmt.Errorf("保存图片失败: %v", err)
-
 	}
 
+	log.Printf("图片已保存到: %s", destinationPath)
 	return nil
 }
