@@ -176,7 +176,7 @@ export default {
         const lastIdx = this.temp_generatedImg_results.length - 1;
         this.$set(this.temp_generatedImg_results[lastIdx], 'img_url', imageUrl);
          // 发送历史记录请求
-    await this.$axios.post('http://localhost:8080/auth/generate/addhistory', {
+    await this.$axios.post('/auth/generate/addhistory', {
       prompt: this.form.prompt,
       width: this.form.width,
       height: this.form.height,
@@ -229,7 +229,7 @@ export default {
   },
   favoriteImage(img) {
     console.log('Favorite image:', img);
-    this.$axios.post('http://localhost:8080/auth/addFavoritedImage', {url: img.img_url}, {
+    this.$axios.post('/auth/addFavoritedImage', {url: img.img_url}, {
                         headers: {
                             'Content-Type': 'application/json', // 设置请求头
                         },                      
@@ -356,7 +356,7 @@ export default {
   
       this.loading = true;
 
-      return this.$axios.post('http://localhost:8080/auth/generate', this.form, {
+      return this.$axios.post('/auth/generate', this.form, {
         timeout: 300000 // 设置超时时间为300秒
       }).then(response => {
         if (response && response.data) {

@@ -79,8 +79,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-
+// import axios from 'axios';
+import apiClient from '@/api';
 export default {
   data() {
     return {
@@ -136,8 +136,8 @@ export default {
         const params = new URLSearchParams();
         features.forEach(feature => params.append('feature', feature));
 
-        const response = await axios.get(
-            'http://localhost:8080/auth/image/feature',
+        const response = await apiClient.get(
+            '/auth/image/feature',
             {
                 headers: {
                     'Authorization': this.token,  // 携带 token
@@ -171,8 +171,8 @@ export default {
     async addFavoriteImage(image) {
       try {
                 
-                const response = await axios.post(
-                    'http://localhost:8080/auth/addFavoritedImage',
+                const response = await apiClient.post(
+                    '/auth/addFavoritedImage',
                     {url:image.url},
                     {
                         headers: {
@@ -203,8 +203,7 @@ export default {
         },
     async getHistoryImages() {
       try {
-        const response = await fetch("http://localhost:8080/auth/user/images", {
-          method: 'GET',
+        const response = await apiClient.get("/auth/user/images", {
           headers: {
             Authorization: this.token,  // 携带 token
           },
@@ -265,8 +264,7 @@ export default {
     },
     async getPeriodImages(start,end) {
       try {
-        const response = await fetch("http://localhost:8080/auth/user/images/timeRange?start_time="+start+"&end_time="+end, {
-          method: 'GET',
+        const response = await apiClient.get("/auth/user/images/timeRange?start_time="+start+"&end_time="+end, {
           headers: {
             Authorization: this.token,  // 携带 token
           },
@@ -325,8 +323,8 @@ export default {
         },
     async deleteRecord(image) {
       try {
-                const response = await axios.post(
-                    'http://localhost:8080/auth/user/deleteImages', {ids:[image.id]},{
+                const response = await apiClient.post(
+                    '/auth/user/deleteImages', {ids:[image.id]},{
                     headers: {
                         Authorization: this.token,
                         'Content-Type':'application/json'

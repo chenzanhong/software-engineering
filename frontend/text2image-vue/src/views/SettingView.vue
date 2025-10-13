@@ -204,7 +204,7 @@ export default {
     },
     async signIn() {
       try {
-        const response = await this.$axios.get('http://localhost:8080/auth/score', {
+        const response = await this.$axios.get('/auth/score', {
           headers: {
             Authorization: localStorage.getItem('token') || ''
           }
@@ -239,7 +239,7 @@ export default {
     },
 
     performLogout() {
-      this.$axios.delete('http://localhost:8080/auth/root/deleteOneUser', {
+      this.$axios.delete('/auth/root/deleteOneUser', {
         params: {
           isOwn: true
         },
@@ -272,7 +272,7 @@ export default {
       "avatar_url": this.user.avatar
     };
 
-    this.$axios.put('http://localhost:8080/auth/user/update', updatedUser)
+    this.$axios.put('/auth/user/update', updatedUser)
       .then(response => {
         if (response && response.data) {
           this.$message.success(response.data.message);

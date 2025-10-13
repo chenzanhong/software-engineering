@@ -123,7 +123,7 @@ export default {
 //         "create_time": "0001-01-01T00:00:00Z"
 //     }
 // }
-    this.$axios.get('http://localhost:8080/auth/user/info').then(response => {
+    this.$axios.get('/auth/user/info').then(response => {
       localStorage.setItem('avatarUrl', response.data.user.avatar_url);
       localStorage.setItem('username', response.data.user.username);
       localStorage.setItem('email',response.data.user.email)

@@ -126,7 +126,7 @@ export default {
   },
   methods: {
     fetchImages() {
-      this.$axios.get('http://localhost:8080/auth/imageSquare')
+      this.$axios.get('/auth/imageSquare')
         .then(response => {
           this.images = response.data.images;
         })
@@ -147,7 +147,7 @@ export default {
     // 先将本地的 isliked 字段设置为 true
     image.isliked = true;
 
-    this.$axios.post('http://localhost:8080/auth/like', { url: image.picture })
+    this.$axios.post('/auth/like', { url: image.picture })
       .then(response => {
         if (response.status === 200) {
           image.likecount = response.data.current_likes;

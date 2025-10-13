@@ -47,7 +47,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
+import apiClient from '@/api';
 
 export default {
     data() {
@@ -66,12 +67,11 @@ export default {
         async getFavoritedImages() {
             //console.log(this.token);
             try {
-                const response = await fetch("http://localhost:8080/auth/user/favoritedimages", {
-                    method: 'GET',
+                 const response = await apiClient.get('/auth/user/favoritedimages', {
                     headers: {
-                        Authorization: this.token,  // 携带 token
+                        Authorization: this.token,
                     },
-                })
+                });
                 
                 const data = await response.json();
                 this.images = data.map(item => ({
@@ -95,7 +95,7 @@ export default {
         // async addFavoriteImage(imageId, imageUrl) {
         //     try {
         //         const response = await axios.post(
-        //             'http://localhost:8080/auth/addFavoritedImage',
+        //             'http://113.44.170.52:8080/auth/addFavoritedImage',
         //             { id: imageId, url: imageUrl },  // 只需传递 id 或 url
         //             {
         //                 headers: {
@@ -138,8 +138,8 @@ export default {
         // 取消收藏图像
         async removeFavorite(image) {
             try {
-                const response = await axios.delete(
-                    'http://localhost:8080/auth/deleteFavoritedImage', {
+                const response = await apiClient.delete(
+                    '/auth/deleteFavoritedImage', {
                     headers: {
                         Authorization: this.token,
                     },

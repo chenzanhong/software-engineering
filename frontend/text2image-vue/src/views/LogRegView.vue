@@ -97,6 +97,7 @@
 
 <script>
 import axios from 'axios';
+import apiClient from '@/api';
 
 export default {
   computed: {
@@ -178,7 +179,7 @@ export default {
           password: hashedPassword
         };
         try {
-          const response = await axios.post('http://localhost:8080/login', formData);
+          const response = await apiClient.post('/login', formData);
           if (response.data.code === 200) {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', this.loginForm.username);
@@ -208,7 +209,7 @@ export default {
             username: this.registerForm.uname,
             password: hashedPassword
           };
-          const response = await axios.post('http://localhost:8080/register', formattedFormData);
+          const response = await axios.post('/register', formattedFormData);
           if (response.data.code === 200) {
             this.$message.success('注册成功');
           } 

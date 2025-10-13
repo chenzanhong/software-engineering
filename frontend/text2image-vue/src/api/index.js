@@ -1,9 +1,12 @@
 // src/api/index.js
 import axios from 'axios';
 
+// 从环境变量读取 API 地址，如果没设置则 fallback 到本地
+const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8080';
+
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080',
-    timeout: 10000, // 请求超时时间
+    baseURL: API_BASE_URL,
+    timeout: 10000,
 });
 
 // 请求拦截器
