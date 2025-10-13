@@ -73,7 +73,7 @@ export default {
                     },
                 });
                 
-                const data = await response.json();
+                const data = await response.data;
                 this.images = data.map(item => ({
                 id: item.id,
                 url: item.picture,

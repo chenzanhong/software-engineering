@@ -2,7 +2,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -37,7 +37,11 @@ type Config struct {
 	Model ModelConfig `yaml:"model"`
 }
 
-func getDBConfigPath() string {
+// 工作目录相对路径（+ flag/env）	⭐⭐⭐⭐☆（非常普遍）	✅ 推荐
+// runtime.Caller() 构建路径	⭐（极少）	❌ 不推荐
+// 绝对路径硬编码	⭐	❌ 不推荐
+
+func getDBConfigPath() string { 
 	// 获取调用者的文件名（即 login_test.go 或 findByFeature.go）
 	_, filename, _, ok := runtime.Caller(2) // 注意这里使用 Caller(2)
 	if !ok {
@@ -83,95 +87,74 @@ func getConfigPath() string {
 	return filepath.Join(currentDir, "..", "configs", "config.yaml")
 }
 
-// LoadConfig 加载配置：优先环境变量，降级使用 YAML
+// LoadConfig 加载配置：YAML 为默认值，环境变量优先覆盖
 func LoadConfig() (*Config, error) {
+	// 1️⃣ 先加载 config.yaml 作为基础配置（默认值）
 	var config Config
+	yamlPath := GetDBConfigPath()
 
-	// 1️⃣ 先尝试从环境变量加载
-	config = Config{
-		DB: DBConfig{
-			Host:     getEnv("DB_HOST", ""),
-			Port:     getEnv("DB_PORT", ""),
-			Name:     getEnv("DB_NAME", ""),
-			User:     getEnv("DB_USER", ""),
-			Password: getEnv("DB_PASSWORD", ""),
-		},
-		OSS: OSSConfig{
-			OSS_REGION:            getEnv("OSS_REGION", ""),
-			OSS_ACCESS_KEY_ID:     getEnv("OSS_ACCESS_KEY_ID", ""),
-			OSS_ACCESS_KEY_SECRET: getEnv("OSS_ACCESS_KEY_SECRET", ""),
-			OSS_BUCKET:            getEnv("OSS_BUCKET", ""),
-		},
-		Model: ModelConfig{
-			GEN_API_KEY: getEnv("GEN_API_KEY", ""),
-			Time:        getEnv("MODEL_TIMEOUT", ""),
-		},
+	log.Printf("正在读取配置文件: %s", yamlPath)
+	yamlFile, err := os.ReadFile(yamlPath)
+	if err != nil {
+		return nil, &ConfigError{fmt.Sprintf("config.yaml 读取失败: %v", err)}
 	}
 
-	// 2️⃣ 检查是否有字段为空，如果有，则从 YAML 文件加载
-	// 如果环境变量中缺少关键字段（如 DB_HOST），则加载 YAML
-	if config.DB.Host == "" || config.DB.Name == "" {
-		log.Println("环境变量中缺少关键配置，尝试加载 config.yaml...")
-		yamlPath := GetDBConfigPath()
-
-		yamlFile, err := ioutil.ReadFile(yamlPath)
-		if err != nil {
-			log.Printf("⚠️ 无法读取 config.yaml: %v", err)
-			// 即使文件不存在，也不 panic，继续使用环境变量（可能部分为空）
-			return &config, nil // 返回部分配置
-		}
-
-		var yamlConfig Config
-		err = yaml.Unmarshal(yamlFile, &yamlConfig)
-		if err != nil {
-			log.Printf("❌ 解析 config.yaml 失败: %v", err)
-			return &config, nil // 降级返回环境变量配置
-		}
-
-		// 合并：仅填充环境变量中为空的字段
-		if config.DB.Host == "" {
-			config.DB.Host = yamlConfig.DB.Host
-		}
-		if config.DB.Port == "" {
-			config.DB.Port = yamlConfig.DB.Port
-		}
-		if config.DB.Name == "" {
-			config.DB.Name = yamlConfig.DB.Name
-		}
-		if config.DB.User == "" {
-			config.DB.User = yamlConfig.DB.User
-		}
-		if config.DB.Password == "" {
-			config.DB.Password = yamlConfig.DB.Password
-		}
-
-		// OSS 和 Model 同理
-		if config.OSS.OSS_REGION == "" {
-			config.OSS.OSS_REGION = yamlConfig.OSS.OSS_REGION
-		}
-		if config.OSS.OSS_ACCESS_KEY_ID == "" {
-			config.OSS.OSS_ACCESS_KEY_ID = yamlConfig.OSS.OSS_ACCESS_KEY_ID
-		}
-		if config.OSS.OSS_ACCESS_KEY_SECRET == "" {
-			config.OSS.OSS_ACCESS_KEY_SECRET = yamlConfig.OSS.OSS_ACCESS_KEY_SECRET
-		}
-		if config.OSS.OSS_BUCKET == "" {
-			config.OSS.OSS_BUCKET = yamlConfig.OSS.OSS_BUCKET
-		}
-
-		if config.Model.GEN_API_KEY == "" {
-			config.Model.GEN_API_KEY = yamlConfig.Model.GEN_API_KEY
-		}
-		if config.Model.Time == "" {
-			config.Model.Time = yamlConfig.Model.Time
-		}
-
-		log.Printf("✅ 已从 config.yaml 补充配置: DB=%s@%s:%s", config.DB.User, config.DB.Host, config.DB.Port)
+	err = yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		return nil, &ConfigError{fmt.Sprintf("config.yaml 解析失败: %v", err)}
 	}
 
-	// 3️⃣ 最终检查关键字段
-	if config.DB.Host == "" || config.DB.Name == "" || config.DB.User == "" {
-		return nil, &ConfigError{"缺少数据库配置（DB_HOST、DB_NAME、DB_USER）"}
+	log.Println("✅ 已从 config.yaml 加载默认配置")
+
+	// 2️⃣ 用环境变量覆盖 YAML 中的值（环境变量优先）
+	if v := os.Getenv("DB_HOST"); v != "" {
+		config.DB.Host = v
+	}
+	if v := os.Getenv("DB_PORT"); v != "" {
+		config.DB.Port = v
+	}
+	if v := os.Getenv("DB_NAME"); v != "" {
+		config.DB.Name = v
+	}
+	if v := os.Getenv("DB_USER"); v != "" {
+		config.DB.User = v
+	}
+	if v := os.Getenv("DB_PASSWORD"); v != "" {
+		config.DB.Password = v
+	}
+
+	if v := os.Getenv("OSS_REGION"); v != "" {
+		config.OSS.OSS_REGION = v
+	}
+	if v := os.Getenv("OSS_ACCESS_KEY_ID"); v != "" {
+		config.OSS.OSS_ACCESS_KEY_ID = v
+	}
+	if v := os.Getenv("OSS_ACCESS_KEY_SECRET"); v != "" {
+		config.OSS.OSS_ACCESS_KEY_SECRET = v
+	}
+	if v := os.Getenv("OSS_BUCKET"); v != "" {
+		config.OSS.OSS_BUCKET = v
+	}
+
+	if v := os.Getenv("GEN_API_KEY"); v != "" {
+		config.Model.GEN_API_KEY = v
+	}
+	if v := os.Getenv("MODEL_TIMEOUT"); v != "" {
+		config.Model.Time = v
+	}
+
+	// 3️⃣ 最终校验关键字段
+	if config.DB.Host == "" {
+		return nil, &ConfigError{"DB_HOST 不能为空"}
+	}
+	if config.DB.Name == "" {
+		return nil, &ConfigError{"DB_NAME 不能为空"}
+	}
+	if config.DB.User == "" {
+		return nil, &ConfigError{"DB_USER 不能为空"}
+	}
+	if config.Model.GEN_API_KEY == "" {
+		return nil, &ConfigError{"GEN_API_KEY 不能为空（请在环境变量或 config.yaml 中设置）"}
 	}
 
 	return &config, nil

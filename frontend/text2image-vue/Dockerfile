@@ -1,14 +1,21 @@
-FROM node:16-alpine
+FROM node:18-alpine AS builder
 
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
+RUN npm install --registry https://registry.npmmirror.com
+
+# 接收构建参数
+ARG VUE_APP_API_BASE_URL
+ENV VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
 
 COPY . .
+RUN chmod -R +x node_modules/.bin/
 
-# 暴露开发端口（如 Vite 默认 3000）
-EXPOSE 3000
+RUN npm run build  # 构建时会读取 .env 或 ARG 注入的变量
 
-# 启动开发服务器，监听 0.0.0.0
-CMD ["npm", "run", "serve"]
+# 第二阶段：Nginx 托管
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

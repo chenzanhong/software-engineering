@@ -1,3 +1,4 @@
+// backend\text-to-picture\models\init\init.go
 package models
 
 import (
@@ -146,8 +147,8 @@ func InitTestUser() error {
 	user = user2.UserInformation{
 		Email:       "root@example.com",                                                                                    // 用户邮箱
 		UserName:    "root",                                                                                                // 用户名
-		Password:    "bcb15f821479b4d5772bd0ca866c00ad5f926e3580720659cc80d39c9d09802a",                                    // 密码（加密后的）
-		Avatar_url:  "https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202407272335307.png", // 头像URL
+		Password:    "bcb15f821479b4d5772bd0ca866c00ad5f926e3580720659cc80d39c9d09802a",                                    // 密码（加密后的，111111）
+		Avatar_url:  "https://whxh-czh.oss-cn-shenzhen.aliyuncs.com/generate/main.jpg", // 头像URL
 		Score:       10000,                                                                                                 // 用户分数
 		Create_time: currentTime.AddDate(-1, 0, 0),                                                                         // 创建时间为一年前
 	}

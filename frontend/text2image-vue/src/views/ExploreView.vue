@@ -135,14 +135,14 @@ export default {
         });
     },
     selectStyle(index) {
-    this.currentStyle = index;
-  },
-  likeImage(imageId) {
-    const image = this.images.find(img => img.id === imageId);
-    if (!image) {
-      console.error('Image not found');
-      return;
-    }
+      this.currentStyle = index;
+    },
+    likeImage(imageId) {
+      const image = this.images.find(img => img.id === imageId);
+      if (!image) {
+        console.error('Image not found');
+        return;
+      }
 
     // 先将本地的 isliked 字段设置为 true
     image.isliked = true;

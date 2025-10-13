@@ -209,7 +209,7 @@ export default {
             username: this.registerForm.uname,
             password: hashedPassword
           };
-          const response = await axios.post('/register', formattedFormData);
+          const response = await this.$axios.post('/register', formattedFormData);
           if (response.data.code === 200) {
             this.$message.success('注册成功');
           } 

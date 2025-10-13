@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       user: {
-        avatar: localStorage.getItem('avatarUrl') || 'https://chuhsing-blog-bucket.oss-cn-shenzhen.aliyuncs.com.aliyuncs.com/chuhsing/202412092143859.png',
+        avatar: localStorage.getItem('avatarUrl') || 'https://whxh-czh.oss-cn-shenzhen.aliyuncs.com/generate/main.jpg',
         username: localStorage.getItem('username') || '未知用户',
         email: localStorage.getItem('email') || '未知邮箱',
         collectedPictures: localStorage.getItem('score') || 0,
@@ -134,6 +134,17 @@ export default {
       }
     },
     async deleteOldAvatar() {
+      // 📢 打印配置信息（用于调试）
+       const region = process.env.VUE_APP_OSS_REGION;
+  const accessKeyId = process.env.VUE_APP_OSS_ACCESS_KEY_ID;
+  const accessKeySecret = process.env.VUE_APP_OSS_ACCESS_KEY_SECRET;
+  const bucket = process.env.VUE_APP_OSS_BUCKET;
+      console.log('OSS Config:', {
+        region,
+        accessKeyId: accessKeyId ? '✔️ 已设置' : '❌ 未设置',
+        accessKeySecret: accessKeySecret ? '✔️ 已设置' : '❌ 未设置',
+        bucket,
+      });
       if (this.user.avatar) {
         const urlParts = this.user.avatar.split('/');
         const fileName = urlParts[urlParts.length - 1];

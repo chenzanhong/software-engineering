@@ -6,9 +6,10 @@ services:
       context: ./frontend/text2image-vue
       dockerfile: Dockerfile
       args:
-        - VUE_APP_API_BASE_URL=http://backend:8080  # ✅ 构建时注入
+        # - VUE_APP_API_BASE_URL=http://backend:8080  # ✅ 构建时注入
+        - VUE_APP_API_BASE_URL=/api #http://113.44.170.52:8080  # ✅ 构建时注入
     ports:
-      - "3000:3000"
+      - "3000:80" # 通过nginx监听80端口
     depends_on:
       - backend
     restart: unless-stopped
@@ -23,8 +24,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=czh20040301
       - DB_NAME=text_to_picture
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
     depends_on:
       postgres:
         condition: service_started
@@ -39,8 +40,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./wait-for-postgres.sh:/wait-for-postgres.sh  # 可选脚本
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d text_to_picture"]
       interval: 10s
@@ -53,3 +54,5 @@ volumes:
 
 # 构建并启动所有服务（-d 后台运行）
 # docker-compose up -d --build
+# 或者
+# docker compose up -d --build

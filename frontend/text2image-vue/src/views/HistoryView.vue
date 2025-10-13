@@ -209,7 +209,7 @@ export default {
           },
         });
 
-        const data = await response.json();
+        const data = await response.data;
         //console.log(data);
         console.log(localStorage.getItem('token')? '有token':'没有token');
         console.log(1234567);
@@ -273,7 +273,7 @@ export default {
         console.log('get开始日期:', start);
         console.log('get结束日期:', end);
 
-        const data = await response.json();
+        const data = await response.data;
         console.log(data);
 
         const images = data.images;

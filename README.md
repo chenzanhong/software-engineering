@@ -56,19 +56,34 @@
    cd frontend/text2image-vue
    ```
    
-2. **创建 `.env` 文件**：
+2. **创建 `.env.local` 文件**：
    ```bash
-   touch .env
-   vim .env
+   vim .env.local
    ```
 
-3. **编辑 `.env` 文件**：
-   在 `.env` 文件中，填入阿里云OSS的密钥。以下是一个示例配置：
+3. **编辑 `.env.local` 文件**：
+   在 `.env.local` 文件中，填入阿里云OSS的密钥。以下是一个示例配置：
    ```plaintext
    VUE_APP_OSS_REGION=oss-cn-shenzhen.aliyuncs.com
    VUE_APP_OSS_ACCESS_KEY_ID=your_access_key_id
    VUE_APP_OSS_ACCESS_KEY_SECRET=your_access_key_secret
    VUE_APP_OSS_BUCKET=your_bucket_name
+   ```
+
+4. **创建 `.env.development` 和 `.env.production` 文件**：
+   ```bash
+   vim .env.development
+   vim .env.production
+   ```
+
+5. **编辑 `.env.development` 和 `.env.production` 文件**：
+   - .env.development里面
+   ```plaintext
+   VUE_APP_API_BASE_URL=http://localhost:8080
+   ```
+   - .env.production
+   ```plaintext
+   VUE_APP_API_BASE_URL=http://生产环境的公网IP:8080
    ```
 
 ### 启动前端
@@ -117,11 +132,20 @@
      OSS_BUCKET: bucket # oss bucket
 
    model:
-     GEN_API_KEY: sk-6e79f5171c934d8fbbbdb0f4cd42d669 # api_key
+     GEN_API_KEY: sk-6f51ded471c934d8fbbb79b0f4c2d669 # api_key
      timeout: 30 # 轮询时间
    ```
 
 
+## Docker Compose 启动
+- 配置好前后端相关配置文件后
+```bash
+docker compose up -d --build
+
+# docker logs container_id #查看日志
+# docker exec -it container_id /bin/sh # 进入容器内部
+```
+-- 然后浏览器上访问http://your_ip:3000/about。本地运行则用localhost，服务器上则用公网IP。
 
 ## 其他注意事项
 
